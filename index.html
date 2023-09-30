@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Complete the square</title>
+</head>
+<body onload="generatePolynomial()">
+<div>
+    <label>
+        Input your polynomial of form ax^2 + bx + c:
+        <input id="data" pattern="([0-9]*)?\s*x\s*\^2\s*\+\s*([0-9]*)x\s*\+?\s*([0-9])?" value="2x^2 + 3x + 4">
+        <button onclick="generatePolynomial()">generate!</button>
+    </label>
+</div>
+<div hidden id="content">
+    First we create something with the area of all the multiplications here
+    <br>
+    <math>
+        (
+        <mi>a</mi>
+        <msup>
+            <mi>x</mi>
+            <mn>2</mn>
+        </msup>
+        +
+        <mi>b</mi>
+        <mi>x</mi>
+        ) +
+        <mi>c</mi>
+    </math>
+    <canvas id="initial_representation" width="1500" height="400" style="width: 1500px; height: 400px;"></canvas>
+    We then spread that
+    <math>
+        <mi>b</mi>
+    </math>
+    over all the
+    <math>
+        <mi>x</mi>
+    </math>
+    squares, by dividing
+    <math>
+        <mi>b</mi>
+        *
+        <mi>x</mi>
+    </math>
+    by
+    <math>
+        <mi>a</mi>
+    </math>
+    <br>
+    <math>
+        <mi>a</mi>
+        (
+        <msup>
+            <mi>x</mi>
+            <mn>2</mn>
+        </msup>
+        +
+        <mfrac>
+            <mi>b</mi>
+            <mn>a</mn>
+        </mfrac>
+        <mi>x</mi>
+        ) +
+        <mi>c</mi>
+    </math>
+    <canvas id="spread_b_representation" width="1500" height="400" style="width: 1500px; height: 400px;"></canvas>
+    Now that we have many uniform rectangles, we simply make them squares.
+    <br>
+    <math>
+        <mi>a</mi>
+        (
+        <msup>
+            <mrow>(
+                <mi>x</mi>
+                +
+                <mfrac>
+                    <mi>b</mi>
+                    <mrow>
+                        <mn>2</mn>
+                        <mi>a</mi>
+                    </mrow>
+                </mfrac>
+                )
+            </mrow>
+            <mn>2</mn>
+        </msup>
+        <mo>-</mo>
+        (
+        <msup>
+            <mrow>
+                <mfrac>
+                    <mi>b</mi>
+                    <mrow>
+                        <mn>2</mn>
+                        <mi>a</mi>
+                    </mrow>
+                </mfrac>
+                )
+            </mrow>
+            <mn>2</mn>
+        </msup>
+        ) +
+        <mi>c</mi>
+    </math>
+    <canvas id="final_representation" width="1500" height="400" style="width: 1500px; height: 400px;"></canvas>
+</div>
+</body>
+<script>
+    // https://regex101.com/r/nx9W5W/1
+    const x = 10;
+    const polynomial_regex = /([0-9]*)?\s*x\s*\^2\s*\+\s*([0-9]*)x\s*\+?\s*([0-9]*)?/gmi;
+    const content = document.getElementById("content");
+    const input = document.getElementById("data");  
+    const initial_representation = document.getElementById("initial_representation");
+    const spread_b_representation = document.getElementById("spread_b_representation");
+    const final_representation = document.getElementById("final_representation");
+    const scale = 10;
+
+    function scaleCtx(ctx) {
+        ctx.lineWidth = 1 / scale;
+        ctx.scale(scale, scale);
+    }
+
+    function fonts(x, b, c_sqrt) {
+        const x_font = `${x / 4}px monospace`;
+        let b_font;
+        if (x / 4 > b * (2 / 3)) {
+            b_font = `${b * (2 / 3)}px monospace`;
+        } else {
+            b_font = x_font;
+        }
+        let c_font;
+        if (x / 4 > c_sqrt / 2) {
+            c_font = `${c_sqrt / 2}px monospace`;
+        } else {
+            c_font = x_font;
+        }
+        return [x_font, b_font, c_font];
+    }
+
+    const irctx = initial_representation.getContext("2d");
+    const sbctx = spread_b_representation.getContext("2d");
+    const frctx = final_representation.getContext("2d");
+    scaleCtx(irctx);
+    scaleCtx(sbctx);
+    scaleCtx(frctx);
+
+    // input form: 2x^2 + 3x + 4
+    function generatePolynomial() {
+        const polynomial = input.value;
+        const coefficients = [...polynomial.matchAll(polynomial_regex)];
+        const a = parseInt(coefficients[0][1]);
+        const b = parseInt(coefficients[0][2]);
+        const c = parseInt(coefficients[0][3]);
+        console.log(coefficients);
+        console.log(`${a} ${b} ${c}`);
+        expandInitialRepresentation(a, b, c, x);
+        expandSpreadBRepresentation(a, b, c, x);
+        expandIndividualSquareRepresentation(a, b, c, x);
+        content.hidden = false;
+    }
+
+    function expandInitialRepresentation(a, b, c, x) {
+        const ctx = initial_representation.getContext("2d");
+        ctx.clearRect(0, 0, initial_representation.width, initial_representation.height);
+        ctx.textAlign = "center";
+        ctx.textBaseline = 'middle';
+        const margin = x * (2 / 3);
+        const half_margin = x * (1 / 3);
+        const half_x = x / 2;
+        const quarter_margin = x * (1 / 6);
+        const c_sqrt = Math.sqrt(c);
+        const [x_font, b_font, c_font] = fonts(x, b, c_sqrt);
+        for (let i = 1; a >= i; i++) {
+            ctx.font = x_font;
+            ctx.fillText("x²", i * x + quarter_margin, margin + quarter_margin + b);
+            ctx.strokeRect(i * x - half_margin, half_margin + b, x, x);
+        }
+        ctx.strokeRect(margin, half_margin + b, x, -b);
+        ctx.fillText("x", half_margin, margin + quarter_margin + b);
+        ctx.font = b_font;
+        ctx.fillText("b", half_margin, b / 2 + half_margin);
+        ctx.fillText("b²", margin + half_x, b / 2 + half_margin, x)
+        ctx.strokeRect(half_margin + x * (a + 1), x + half_margin + b, c_sqrt, -c_sqrt);
+        ctx.font = c_font;
+        ctx.fillText("c²", half_margin + x * (a + 1) + c_sqrt / 2, x + half_margin + b - c_sqrt / 2, c_sqrt * 0.9);
+    }
+
+    function expandSpreadBRepresentation(a, b, c, x) {
+        const ctx = spread_b_representation.getContext("2d");
+        ctx.clearRect(0, 0, spread_b_representation.width, spread_b_representation.height);
+        ctx.textAlign = "center";
+        ctx.textBaseline = 'middle';
+        const margin = x * (2 / 3);
+        const half_margin = x * (1 / 3);
+        const divided_b = b / a;
+        const quarter_margin = x * (1 / 6);
+        const c_sqrt = Math.sqrt(c);
+        const [x_font, b_font, c_font] = fonts(x, divided_b, c_sqrt);
+        for (let i = 1; a >= i; i++) {
+            ctx.font = x_font;
+            ctx.fillText("x²", i * x + quarter_margin, margin + quarter_margin + divided_b);
+            ctx.font = b_font;
+            ctx.fillText("x(b/a)", i * x + quarter_margin, half_margin + (divided_b / 2))
+            ctx.strokeRect(i * x - half_margin, half_margin + divided_b, x, -divided_b);
+            ctx.strokeRect(i * x - half_margin, half_margin + divided_b, x, x);
+        }
+        ctx.font = x_font;
+        ctx.fillText("x", half_margin, margin + quarter_margin + divided_b);
+        ctx.font = b_font;
+        ctx.fillText("b/a", half_margin, half_margin + (divided_b / 2));
+        ctx.strokeRect(half_margin + x * (a + 1), x + half_margin + divided_b, c_sqrt, -c_sqrt);
+        ctx.font = c_font;
+        ctx.fillText("c²", half_margin + x * (a + 1) + c_sqrt / 2, x + half_margin + divided_b - c_sqrt / 2, c_sqrt * 0.9);
+    }
+
+    function expandIndividualSquareRepresentation(a, b, c, x) {
+    }
+
+</script>
+</html>
