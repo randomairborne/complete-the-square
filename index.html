@@ -202,14 +202,14 @@
             ctx.font = x_font;
             ctx.fillText("x²", i * x + quarter_margin, margin + quarter_margin + divided_b);
             ctx.font = b_font;
-            ctx.fillText("x(b/a)", i * x + quarter_margin, half_margin + (divided_b / 2))
+            ctx.fillText(`x(${b}/${a})`, i * x + quarter_margin, half_margin + (divided_b / 2))
             ctx.strokeRect(i * x - half_margin, half_margin + divided_b, x, -divided_b);
             ctx.strokeRect(i * x - half_margin, half_margin + divided_b, x, x);
         }
         ctx.font = x_font;
         ctx.fillText("x", half_margin, margin + quarter_margin + divided_b);
         ctx.font = b_font;
-        ctx.fillText(`${b/a}`, half_margin, half_margin + (divided_b / 2));
+        ctx.fillText(`${b}/${a}`, half_margin, half_margin + (divided_b / 2));
         ctx.strokeRect(half_margin + x * (a + 1), x + half_margin + divided_b, c_sqrt, -c_sqrt);
         ctx.font = c_font;
         ctx.fillText(c.toString(), half_margin + x * (a + 1) + c_sqrt / 2, x + half_margin + divided_b - c_sqrt / 2, c_sqrt * 0.9);
