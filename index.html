@@ -180,11 +180,11 @@
         ctx.strokeRect(margin, half_margin + b, x, -b);
         ctx.fillText("x", half_margin, margin + quarter_margin + b);
         ctx.font = b_font;
-        ctx.fillText("b", half_margin, b / 2 + half_margin);
-        ctx.fillText("b²", margin + half_x, b / 2 + half_margin, x)
+        ctx.fillText(b.toString(), half_margin, b / 2 + half_margin);
+        ctx.fillText(b.toString() + "x", margin + half_x, b / 2 + half_margin, x)
         ctx.strokeRect(half_margin + x * (a + 1), x + half_margin + b, c_sqrt, -c_sqrt);
         ctx.font = c_font;
-        ctx.fillText("c²", half_margin + x * (a + 1) + c_sqrt / 2, x + half_margin + b - c_sqrt / 2, c_sqrt * 0.9);
+        ctx.fillText(c.toString(), half_margin + x * (a + 1) + c_sqrt / 2, x + half_margin + b - c_sqrt / 2, c_sqrt * 0.9);
     }
 
     function expandSpreadBRepresentation(a, b, c, x) {
@@ -209,10 +209,10 @@
         ctx.font = x_font;
         ctx.fillText("x", half_margin, margin + quarter_margin + divided_b);
         ctx.font = b_font;
-        ctx.fillText("b/a", half_margin, half_margin + (divided_b / 2));
+        ctx.fillText(`${b/a}`, half_margin, half_margin + (divided_b / 2));
         ctx.strokeRect(half_margin + x * (a + 1), x + half_margin + divided_b, c_sqrt, -c_sqrt);
         ctx.font = c_font;
-        ctx.fillText("c²", half_margin + x * (a + 1) + c_sqrt / 2, x + half_margin + divided_b - c_sqrt / 2, c_sqrt * 0.9);
+        ctx.fillText(c.toString(), half_margin + x * (a + 1) + c_sqrt / 2, x + half_margin + divided_b - c_sqrt / 2, c_sqrt * 0.9);
     }
 
     function expandIndividualSquareRepresentation(a, b, c, x) {
